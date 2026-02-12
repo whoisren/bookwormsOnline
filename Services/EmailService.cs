@@ -20,6 +20,11 @@ public class EmailService
             throw new InvalidOperationException("SMTP settings are not configured.");
         }
 
+        if (!_options.EnableSsl)
+        {
+            throw new InvalidOperationException("SMTP must be configured to use SSL/TLS when sending email.");
+        }
+
         using var message = new MailMessage
         {
             From = new MailAddress(_options.FromAddress, _options.FromName),
