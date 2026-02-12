@@ -1,0 +1,60 @@
+@page
+@model BookwormsOnline.Pages.Account.LoginModel
+@{
+    ViewData["Title"] = "Member Login";
+}
+
+<h1>Bookworms Online Login</h1>
+
+@if (!string.IsNullOrWhiteSpace(Model.InfoMessage))
+{
+    <div class="alert alert-info">@Model.InfoMessage</div>
+}
+
+<form id="loginForm" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="Input.Email" class="form-label"></label>
+        <input asp-for="Input.Email" class="form-control" autocomplete="email" />
+        <span asp-validation-for="Input.Email" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Input.Password" class="form-label"></label>
+        <input asp-for="Input.Password" class="form-control" autocomplete="current-password" />
+        <span asp-validation-for="Input.Password" class="text-danger"></span>
+    </div>
+
+    <input type="hidden" asp-for="Input.RecaptchaToken" id="LoginRecaptchaToken" />
+
+    <button type="submit" class="btn btn-primary">Login</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://www.google.com/recaptcha/api.js?render=@Model.RecaptchaSiteKey"></script>
+    <script>
+        (function () {
+            const form = document.getElementById('loginForm');
+            if (!form) {
+                return;
+            }
+
+            form.addEventListener('submit', function (event) {
+                if (form.dataset.recaptchaReady === 'true') {
+                    return;
+                }
+
+                event.preventDefault();
+                grecaptcha.ready(function () {
+                    grecaptcha.execute('@Model.RecaptchaSiteKey', { action: 'login' }).then(function (token) {
+                        document.getElementById('LoginRecaptchaToken').value = token;
+                        form.dataset.recaptchaReady = 'true';
+                        form.submit();
+                    });
+                });
+            });
+        })();
+    </script>
+}

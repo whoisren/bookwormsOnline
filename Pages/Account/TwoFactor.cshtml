@@ -1,0 +1,30 @@
+@page
+@model BookwormsOnline.Pages.Account.TwoFactorModel
+@{
+    ViewData["Title"] = "Two-Factor Verification";
+}
+
+<h1>Two-Factor Verification</h1>
+
+@if (!string.IsNullOrWhiteSpace(Model.DevelopmentCode))
+{
+    <div class="alert alert-info">Development code: <strong>@Model.DevelopmentCode</strong></div>
+}
+
+<form method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <input type="hidden" asp-for="Input.Email" />
+
+    <div class="mb-3">
+        <label asp-for="Input.Code" class="form-label"></label>
+        <input asp-for="Input.Code" class="form-control" autocomplete="one-time-code" />
+        <span asp-validation-for="Input.Code" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Verify</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,14 @@
+@page
+@model BookwormsOnline.Pages.Account.LogoutModel
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@{
+    ViewData["Title"] = "Logout";
+}
+
+<h1>Logout</h1>
+
+<form method="post">
+    <p>Are you sure you want to log out?</p>
+    <button type="submit" class="btn btn-danger">Logout</button>
+    <a class="btn btn-secondary" asp-page="/Index">Cancel</a>
+</form>

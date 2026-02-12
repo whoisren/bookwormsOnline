@@ -1,0 +1,155 @@
+@page
+@model BookwormsOnline.Pages.Account.RegisterModel
+@{
+    ViewData["Title"] = "Membership Registration";
+}
+
+<h1>Bookworms Online Membership Registration</h1>
+
+<form id="registerForm" method="post" enctype="multipart/form-data">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="Input.FirstName" class="form-label"></label>
+        <input asp-for="Input.FirstName" class="form-control" />
+        <span asp-validation-for="Input.FirstName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Input.LastName" class="form-label"></label>
+        <input asp-for="Input.LastName" class="form-control" />
+        <span asp-validation-for="Input.LastName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Input.CreditCardNo" class="form-label"></label>
+        <input asp-for="Input.CreditCardNo" class="form-control" autocomplete="cc-number" maxlength="16" pattern="\d{16}" />
+        <span asp-validation-for="Input.CreditCardNo" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Input.MobileNo" class="form-label"></label>
+        <input asp-for="Input.MobileNo" class="form-control" autocomplete="tel" />
+        <span asp-validation-for="Input.MobileNo" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Input.BillingAddress" class="form-label"></label>
+        <textarea asp-for="Input.BillingAddress" class="form-control"></textarea>
+        <span asp-validation-for="Input.BillingAddress" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Input.ShippingAddress" class="form-label"></label>
+        <textarea asp-for="Input.ShippingAddress" class="form-control"></textarea>
+        <span asp-validation-for="Input.ShippingAddress" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Input.Email" class="form-label"></label>
+        <input asp-for="Input.Email" class="form-control" autocomplete="email" />
+        <span asp-validation-for="Input.Email" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Input.Password" class="form-label"></label>
+        <input asp-for="Input.Password" class="form-control" autocomplete="new-password" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{12,}" />
+        <div class="progress mt-2" style="height: 6px;">
+            <div id="passwordStrengthBar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+        <small id="passwordStrength" class="form-text text-danger"></small>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Input.ConfirmPassword" class="form-label"></label>
+        <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9]).{12,}" />
+        <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Input.Photo" class="form-label"></label>
+        <input asp-for="Input.Photo" class="form-control" type="file" accept=".jpg" />
+        <span asp-validation-for="Input.Photo" class="text-danger"></span>
+    </div>
+
+    <input type="hidden" asp-for="Input.RecaptchaToken" id="RecaptchaToken" />
+
+    <button type="submit" class="btn btn-primary">Register</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://www.google.com/recaptcha/api.js?render=@Model.RecaptchaSiteKey"></script>
+    <script>
+        (function () {
+            const form = document.getElementById('registerForm');
+            if (!form) {
+                return;
+            }
+
+            form.addEventListener('submit', function (event) {
+                if (form.dataset.recaptchaReady === 'true') {
+                    return;
+                }
+
+                event.preventDefault();
+                grecaptcha.ready(function () {
+                    grecaptcha.execute('@Model.RecaptchaSiteKey', { action: 'register' }).then(function (token) {
+                        document.getElementById('RecaptchaToken').value = token;
+                        form.dataset.recaptchaReady = 'true';
+                        form.submit();
+                    });
+                });
+            });
+
+            const passwordInput = document.getElementById('Input_Password');
+            const strength = document.getElementById('passwordStrength');
+            const strengthBar = document.getElementById('passwordStrengthBar');
+            if (passwordInput && strength) {
+                passwordInput.addEventListener('input', function () {
+                    const value = passwordInput.value || '';
+                    const checks = [
+                        value.length >= 12,
+                        /[a-z]/.test(value),
+                        /[A-Z]/.test(value),
+                        /\d/.test(value),
+                        /[^a-zA-Z0-9]/.test(value)
+                    ];
+                    const passed = checks.filter(Boolean).length;
+                    const percent = Math.round((passed / checks.length) * 100);
+                    const strong = passed === checks.length;
+
+                    const missing = [];
+                    if (value.length < 12) {
+                        missing.push('12 characters');
+                    }
+                    if (!/[a-z]/.test(value)) {
+                        missing.push('lowercase');
+                    }
+                    if (!/[A-Z]/.test(value)) {
+                        missing.push('uppercase');
+                    }
+                    if (!/\d/.test(value)) {
+                        missing.push('number');
+                    }
+                    if (!/[^a-zA-Z0-9]/.test(value)) {
+                        missing.push('special character');
+                    }
+
+                    strength.textContent = strong ? 'Strong password.' : `Missing: ${missing.join(', ')}.`;
+                    strength.classList.toggle('text-success', strong);
+                    strength.classList.toggle('text-danger', !strong);
+
+                    if (strengthBar) {
+                        strengthBar.style.width = `${percent}%`;
+                        strengthBar.classList.toggle('bg-success', strong);
+                        strengthBar.classList.toggle('bg-warning', passed > 0 && !strong);
+                        strengthBar.classList.toggle('bg-danger', passed === 0);
+                    }
+                });
+
+                passwordInput.dispatchEvent(new Event('input'));
+            }
+        })();
+    </script>
+}

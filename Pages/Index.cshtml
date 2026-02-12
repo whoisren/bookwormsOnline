@@ -1,0 +1,43 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome to Bookworms Online</h1>
+    @if (User.Identity?.IsAuthenticated ?? false)
+    {
+        <p class="lead">Logged in as @User.Identity?.Name</p>
+        if (Model.Profile is not null)
+        {
+            <div class="card mt-4 text-start">
+                <div class="card-body">
+                    <h2 class="h5">Member Details</h2>
+                    @if (!string.IsNullOrWhiteSpace(Model.Profile.PhotoUrl))
+                    {
+                        <div class="mb-3">
+                            <img src="@Model.Profile.PhotoUrl" alt="Member photo" class="img-thumbnail" style="max-width: 200px;" />
+                        </div>
+                    }
+                    <dl class="row">
+                        <dt class="col-sm-4">Email</dt>
+                        <dd class="col-sm-8">@Model.Profile.Email</dd>
+                        <dt class="col-sm-4">Mobile No</dt>
+                        <dd class="col-sm-8">@Model.Profile.MobileNo</dd>
+                        <dt class="col-sm-4">Billing Address</dt>
+                        <dd class="col-sm-8">@Model.Profile.BillingAddress</dd>
+                        <dt class="col-sm-4">Shipping Address</dt>
+                        <dd class="col-sm-8">@Model.Profile.ShippingAddress</dd>
+                        <dt class="col-sm-4">Credit Card</dt>
+                        <dd class="col-sm-8">@Model.Profile.MaskedCreditCard</dd>
+                    </dl>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <p class="lead">Please register or log in to access your membership.</p>
+    }
+</div>
